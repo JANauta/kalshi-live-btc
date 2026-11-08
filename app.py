@@ -90,7 +90,7 @@ with st.expander("⚙️ Decision settings"):
 
 # One fragment handles quotes/decision at 3-second intervals. Chart is rendered
 # separately below, so it is not reconstructed on every quote update.
-@st.fragment(run_every="3s")
+@st.fragment(run_every="1s")
 def live_monitor():
     now = datetime.now(timezone.utc)
     try:
