@@ -1,6 +1,9 @@
 
 import streamlit as st
 import requests
+import pandas as pd
+import plotly.graph_objects as go
+
 from datetime import datetime, timezone
 
 st.set_page_config(
@@ -50,7 +53,7 @@ def get_active_market():
     candidates.sort(key=lambda item: item[0])
     return candidates[0][1]["ticker"]
 
-@st.fragment(run_every="1s")
+@st.fragment(run_every="2s")
 def live_dashboard():
     now = datetime.now(timezone.utc)
     st.caption(
@@ -122,6 +125,82 @@ def live_dashboard():
         st.write("Market title:", m.get("title"))
         st.write("Rules:", m.get("rules_primary"))
         st.write("Strike:", m.get("floor_strike"))
+        
+        # Kalshi target vs. Coinbase BTC chart
+        target = m.get("floor_strike")
+
+        if target is not None:
+            target = float(target)
+
+            st.subheader("BTC Price vs. Kalshi Target")
+
+            candles = get_json(
+                "https://api.exchange.coinbase.com/products/"
+                "BTC-USD/candles",
+                {"granularity": 60}
+            )
+
+            df = pd.DataFrame(
+                candles,
+                columns=[
+                    "time", "low", "high",
+                    "open", "close", "volume"
+                ]
+            )
+
+            df["time"] = pd.to_datetime(
+                df["time"], unit="s", utc=True
+            )
+            df = df.sort_values("time").tail(30)
+
+            fig = go.Figure()
+
+            fig.add_trace(go.Scatter(
+                x=df["time"],
+                y=df["close"],
+                mode="lines",
+                name="Coinbase BTC",
+                line=dict(color="#16a34a", width=2)
+            ))
+
+            fig.add_hline(
+                y=target,
+                line_color="#ef4444",
+                line_dash="dash",
+                annotation_text=f"Kalshi Target ${target:,.2f}"
+            )
+
+            fig.update_layout(
+                height=420,
+                xaxis_title="Time (UTC)",
+                yaxis_title="BTC/USD",
+                hovermode="x unified"
+            )
+
+            st.plotly_chart(
+                fig,
+                use_container_width=True
+            )
+
+            current_btc = float(btc["price"])
+            difference = current_btc - target
+
+            st.metric(
+                "Coinbase Distance From Kalshi Target",
+                f"${difference:+,.2f}"
+            )
+
+            if difference > 0:
+                st.success("Coinbase BTC is ABOVE target")
+            elif difference < 0:
+                st.error("Coinbase BTC is BELOW target")
+            else:
+                st.warning("Coinbase BTC is AT target")
+        else:
+            st.warning(
+                "Target price unavailable from Kalshi API."
+            )
+
         st.write("Volume:", m.get("volume_fp"))
 
         st.info(
