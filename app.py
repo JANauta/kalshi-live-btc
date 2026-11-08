@@ -100,14 +100,19 @@ def dashboard():
         market = market_detail(ticker)
         close_time = datetime.fromisoformat(market["close_time"].replace("Z", "+00:00"))
         seconds = max(0, int((close_time - now).total_seconds()))
+        
         mm, ss = divmod(seconds, 60)
+
+        # Decision bot status
         if seconds > 120:
-    st.info("⏳ BOT STATUS: WAITING")
-elif seconds >= 30:
-    st.success("🔍 BOT STATUS: ANALYZING")
-else:
-    st.warning("⛔ BOT STATUS: ENTRY WINDOW CLOSED")
+            st.info("⏳ BOT STATUS: WAITING")
+        elif seconds >= 30:
+            st.success("🔍 BOT STATUS: ANALYZING")
+        else:
+            st.warning("⛔ BOT STATUS: ENTRY WINDOW CLOSED")
+
         btc = btc_ticker()
+
         target = number(market.get("floor_strike"))
         up = number(market.get("yes_ask_dollars"))
         down = number(market.get("no_ask_dollars"))
