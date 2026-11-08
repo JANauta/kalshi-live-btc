@@ -102,15 +102,6 @@ def dashboard():
         seconds = max(0, int((close_time - now).total_seconds()))
         
         mm, ss = divmod(seconds, 60)
-
-        # Decision bot status
-        if seconds > 120:
-            st.info("⏳ BOT STATUS: WAITING")
-        elif seconds >= 30:
-            st.success("🔍 BOT STATUS: ANALYZING")
-        else:
-            st.warning("⛔ BOT STATUS: ENTRY WINDOW CLOSED")
-
         btc = btc_ticker()
 
         target = number(market.get("floor_strike"))
