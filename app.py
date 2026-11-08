@@ -33,7 +33,7 @@ def active_market():
             pass
     return min(candidates)[1] if candidates else None
 
-@st.cache_data(ttl=55, show_spinner=False)
+@st.cache_data(ttl=5, show_spinner=False)
 def candles():
     data = fetch_json(COINBASE + '/candles', {'granularity':60})
     df = pd.DataFrame(data, columns=['time','low','high','open','close','volume'])
@@ -68,7 +68,7 @@ with st.sidebar:
         st.session_state.paper_initial = bankroll_start
         st.rerun()
 
-@st.fragment(run_every='5s')
+@st.fragment(run_every='1s')
 def live_panel():
     st.caption('Refresh requested: ' + datetime.now(timezone.utc).strftime('%H:%M:%S UTC'))
     try:
