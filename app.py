@@ -50,7 +50,7 @@ def get_active_market():
     candidates.sort(key=lambda item: item[0])
     return candidates[0][1]["ticker"]
 
-@st.fragment(run_every="5s")
+@st.fragment(run_every="1s")
 def live_dashboard():
     now = datetime.now(timezone.utc)
     st.caption(
