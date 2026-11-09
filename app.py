@@ -13,7 +13,7 @@ COINBASE = "https://api.exchange.coinbase.com/products/BTC-USD"
 
 def fetch(url, params=None):
     # Separate requests avoid sharing a mutable Session between cached calls.
-    response = requests.get(url, params=params, timeout=(2, 4), headers={"User-Agent": "BTC15mDecisionMonitor/1.1"})
+    response = requests.get(url, params=params, timeout=(5), headers={"User-Agent": "BTC15mDecisionMonitor/1.1"})
     response.raise_for_status()
     return response.json()
 
@@ -33,7 +33,7 @@ def discover_market():
     return min(candidates)[1] if candidates else None
 
 
-@st.cache_data(ttl=3, show_spinner=False)
+@st.cache_data(ttl=2, show_spinner=False)
 def market_detail(ticker):
     return fetch(BASE + "/markets/" + ticker)["market"]
 
