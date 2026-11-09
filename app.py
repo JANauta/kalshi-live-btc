@@ -38,12 +38,12 @@ def market_detail(ticker):
     return fetch(BASE + "/markets/" + ticker)["market"]
 
 
-@st.cache_data(ttl=3, show_spinner=False)
+@st.cache_data(ttl=2, show_spinner=False)
 def btc_ticker():
     return float(fetch(COINBASE + "/ticker")["price"])
 
 
-@st.cache_data(ttl=60, show_spinner=False)
+@st.cache_data(ttl=30, show_spinner=False)
 def btc_candles():
     raw = fetch(COINBASE + "/candles", {"granularity": 60})
     df = pd.DataFrame(raw, columns=["time", "low", "high", "open", "close", "volume"])
